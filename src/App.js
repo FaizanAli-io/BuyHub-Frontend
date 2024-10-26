@@ -1,26 +1,20 @@
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import ListUserPage from './pages/ListUserPage';
-import CreateUserPage from './pages/CreateUserPage';
-import EditUserPage from './pages/EditUserPage';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Home from './components/Home';
 
 function App() {
+  const [user, setUser] = useState(null);
+
   return (
-    <div className="container mt-5">
-      <h1 className="mb-4 text-center">User Management</h1>
-
-      <Router>
-        <nav className="mb-4">
-          <Link to="/users" className="btn btn-outline-primary me-2">List Users</Link>
-          <Link to="/users/create" className="btn btn-outline-success">Create User</Link>
-        </nav>
-
-        <Routes>
-          <Route path="/users" element={<ListUserPage />} />
-          <Route path="/users/create" element={<CreateUserPage />} />
-          <Route path="/users/edit/:id" element={<EditUserPage />} />
-        </Routes>
-      </Router>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login setUser={setUser} />} />
+        <Route path="/signup" element={<Signup setUser={setUser} />} />
+        <Route path="/home" element={user ? <Home /> : <Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
 }
 
