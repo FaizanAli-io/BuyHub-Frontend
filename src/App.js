@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import ListUserPage from './pages/ListUserPage';
 import CreateUserPage from './pages/CreateUserPage';
 import EditUserPage from './pages/EditUserPage';
+import Products from './pages/Products';
 
 function App() {
   return (
@@ -10,14 +11,16 @@ function App() {
 
       <Router>
         <nav className="mb-4">
-          <Link to="/users" className="btn btn-outline-primary me-2">List Users</Link>
-          <Link to="/users/create" className="btn btn-outline-success">Create User</Link>
+          <Link to="/users" className="btn btn-outline-primary me-2">Ok Users</Link>
+          <Link to="/users/create" className="btn btn-outline-success me-2">Create User</Link>
+          <Link to="/products" className="btn btn-outline-secondary">Products</Link> 
         </nav>
 
         <Routes>
           <Route path="/users" element={<ListUserPage />} />
           <Route path="/users/create" element={<CreateUserPage />} />
           <Route path="/users/edit/:id" element={<EditUserPage />} />
+          <Route path="/products" element={<Products />} /> 
         </Routes>
       </Router>
     </div>
