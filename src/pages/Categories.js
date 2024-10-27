@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
+import { useFetchData } from "../hooks/useFetchData";
+import FormInput from "../components/FormInput";
+
+const BASE_URL = "http://localhost:3000";
 
 function Categories() {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useFetchData("categories");
   const [newCategory, setNewCategory] = useState("");
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/categories");
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
     if (!newCategory) return;
 
     try {
-      const response = await axios.post("http://localhost:3000/categories", {
+      const response = await axios.post(`${BASE_URL}/categories`, {
         name: newCategory,
       });
       setCategories((prevCategories) => [...prevCategories, response.data]);
@@ -44,13 +35,13 @@ function Categories() {
         <form onSubmit={handleAddCategory} className="space-y-4">
           <div>
             <label className="block text-gray-400">Category Name</label>
-            <input
+            <FormInput
               type="text"
+              name="categoryName"
+              placeholder="Enter category name"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               className="w-full p-2 rounded bg-gray-700 text-gray-300"
-              placeholder="Enter category name"
-              required
             />
           </div>
           <button
