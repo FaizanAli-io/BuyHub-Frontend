@@ -1,53 +1,101 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const BASE_URL = "http://localhost:3000";
 
 const ProductCard = ({ product, user }) => {
-  const [quantity, setQuantity] = useState(1);
+  const [addQuantity, setAddQuantity] = useState(0);
+  const [cartItem, setCartItem] = useState(null);
+
+  useEffect(() => {
+    const fetchCartItem = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/users/${user.id}/cart`);
+        const item = response.data.find(
+          (item) => item.product.id === product.id
+        );
+        setCartItem(item);
+        setAddQuantity(item ? item.quantity : 1);
+      } catch (error) {
+        console.error("Error fetching cart item:", error);
+      }
+    };
+
+    fetchCartItem();
+  }, [product.id, user.id]);
 
   const handleAddToCart = async () => {
-    if (quantity > product.stock) {
-      alert("Cannot add more than available stock.");
-      return;
-    }
+    if (addQuantity > product.quantity) return;
 
     try {
       await axios.post(`${BASE_URL}/carts`, {
-        userId: user.id, // Assuming user object contains the user's ID
-        productId: product.id, // Product ID to add to the cart
-        quantity: quantity, // Selected quantity
+        userId: user.id,
+        productId: product.id,
+        quantity: addQuantity,
       });
-      alert(`Added ${quantity} of ${product.name} to cart.`);
+      setAddQuantity(0);
     } catch (error) {
       console.error("Error adding to cart:", error);
-      alert("Failed to add to cart.");
+    }
+  };
+
+  const handleUpdateCart = async () => {
+    if (addQuantity > product.quantity) return;
+
+    try {
+      if (addQuantity === 0) {
+        await axios.delete(`${BASE_URL}/carts/${cartItem.id}`);
+      } else {
+        await axios.patch(`${BASE_URL}/carts/${cartItem.id}`, {
+          quantity: addQuantity,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating cart:", error);
     }
   };
 
   return (
-    <div className="bg-gray-700 p-4 rounded-lg">
+    <div className="bg-gray-800 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105">
       <h3 className="text-xl font-bold text-white">{product.name}</h3>
-      <p className="text-gray-400">Price: ${product.price}</p>
-      <p className="text-gray-400">Available: {product.quantity}</p>
+      <p className="text-gray-300">{product.description}</p>
+      <p className="text-gray-200">Price: ${product.price.toFixed(2)}</p>
+      <p className="text-gray-200">Available: {product.quantity}</p>
 
       {user.role === "BUYER" && (
-        <div className="mt-4">
-          <input
-            type="range"
-            min="1"
-            max={product.quantity}
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full"
-          />
-          <span className="text-gray-300">Quantity: {quantity}</span>
-          <button
-            onClick={handleAddToCart}
-            className="mt-2 w-full p-2 text-white bg-cyan-500 rounded hover:bg-cyan-600"
-          >
-            Add to Cart
-          </button>
+        <div className="mt-4 border-t border-gray-600 pt-4">
+          <div className="flex items-center justify-between mt-2">
+            <input
+              type="number"
+              min="0"
+              max={product.quantity}
+              value={addQuantity}
+              onChange={(e) =>
+                setAddQuantity(
+                  Math.max(
+                    0,
+                    Math.min(product.quantity, Number(e.target.value))
+                  )
+                )
+              }
+              className="w-16 p-1 border border-gray-600 rounded-md text-center bg-gray-700 text-white"
+            />
+            {cartItem ? (
+              <button
+                onClick={handleUpdateCart}
+                className="ml-2 px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 transition"
+              >
+                Update Cart
+              </button>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="ml-2 px-4 py-1 text-white bg-green-500 rounded hover:bg-green-600 transition"
+              >
+                Add to Cart
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
