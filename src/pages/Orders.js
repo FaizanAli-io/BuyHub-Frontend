@@ -9,16 +9,35 @@ function Orders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrdersWithProducts = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/users/${user.id}/orders`);
-        setOrders(response.data);
+        const orders = response.data;
+
+        // Fetch product details for each item
+        const ordersWithDetails = await Promise.all(
+          orders.map(async (order) => {
+            const itemsWithDetails = await Promise.all(
+              order.items.map(async (item) => {
+                const productResponse = await axios.get(`${BASE_URL}/products/${item.productId}`);
+                return {
+                  ...item,
+                  productName: productResponse.data.name, // Assume the API returns `name`
+                  productDescription: productResponse.data.description,
+                };
+              })
+            );
+            return { ...order, items: itemsWithDetails };
+          })
+        );
+
+        setOrders(ordersWithDetails);
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("Error fetching orders or product details:", error);
       }
     };
 
-    fetchOrders();
+    fetchOrdersWithProducts();
   }, [user.id]);
 
   return (
@@ -33,7 +52,13 @@ function Orders() {
           {orders.map((order) => (
             <div key={order.id} className="mb-4 border-b border-gray-600 pb-4">
               <h2 className="text-xl font-semibold text-cyan-300">
-                Order ID: {order.id}
+                Products:{" "}
+                {order.items.map((item, index) => (
+                  <span key={item.id}>
+                    {item.productName}
+                    {index < order.items.length - 1 ? ", " : ""}
+                  </span>
+                ))}
               </h2>
               <p className="text-gray-300">Status: {order.status}</p>
               <p className="text-gray-300">Total: ${order.total.toFixed(2)}</p>
@@ -44,11 +69,13 @@ function Orders() {
               <ul className="list-disc list-inside">
                 {order.items.map((item) => (
                   <li key={item.id} className="text-gray-300">
-                    Product ID: {item.productId}, Quantity: {item.quantity},
+                    Product: {item.productName} - {item.productDescription},
+                    Quantity: {item.quantity},
                     Price: ${item.price.toFixed(2)}
                   </li>
                 ))}
               </ul>
+
             </div>
           ))}
         </div>
