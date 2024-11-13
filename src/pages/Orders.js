@@ -9,16 +9,36 @@ function Orders() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrdersWithProducts = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/users/${user.id}/orders`);
-        setOrders(response.data);
+        const orders = response.data;
+
+        // Fetch product details for each item
+        const ordersWithDetails = await Promise.all(
+          orders.map(async (order) => {
+            const itemsWithDetails = await Promise.all(
+              order.items.map(async (item) => {
+                const productResponse = await axios.get(`${BASE_URL}/products/${item.productId}`);
+                return {
+                  ...item,
+                  productName: productResponse.data.name, // Assume the API returns `name`
+                  productDescription: productResponse.data.description,
+                  productPrice: productResponse.data.price, // Add price for total calculation
+                };
+              })
+            );
+            return { ...order, items: itemsWithDetails };
+          })
+        );
+
+        setOrders(ordersWithDetails);
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("Error fetching orders or product details:", error);
       }
     };
 
-    fetchOrders();
+    fetchOrdersWithProducts();
   }, [user.id]);
 
   return (
@@ -31,24 +51,48 @@ function Orders() {
       ) : (
         <div className="w-full max-w-3xl bg-gray-800 rounded-lg shadow-lg p-6">
           {orders.map((order) => (
-            <div key={order.id} className="mb-4 border-b border-gray-600 pb-4">
-              <h2 className="text-xl font-semibold text-cyan-300">
+            <div key={order.id} className="mb-6">
+              <h2 className="text-xl font-semibold text-cyan-300 mb-4">
                 Order ID: {order.id}
               </h2>
-              <p className="text-gray-300">Status: {order.status}</p>
-              <p className="text-gray-300">Total: ${order.total.toFixed(2)}</p>
-              <p className="text-gray-300">
-                Date: {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-              <h3 className="text-lg font-bold text-gray-200 mt-2">Items:</h3>
-              <ul className="list-disc list-inside">
-                {order.items.map((item) => (
-                  <li key={item.id} className="text-gray-300">
-                    Product ID: {item.productId}, Quantity: {item.quantity},
-                    Price: ${item.price.toFixed(2)}
-                  </li>
-                ))}
-              </ul>
+
+              <table className="w-full text-gray-200">
+                <thead>
+                  <tr className="border-b border-gray-500">
+                    <th className="py-3 text-left">Product</th>
+                    <th className="py-3 text-left">Price</th>
+                    <th className="py-3 text-left">Quantity</th>
+                    <th className="py-3 text-left">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.items.map((item) => (
+                    <tr key={item.id} className="border-b border-gray-500">
+                      <td className="py-3 text-gray-300">{item.productName}</td>
+                      <td className="py-3 text-gray-300">
+                        ${item.productPrice.toFixed(2)}
+                      </td>
+                      <td className="py-3 text-gray-300">{item.quantity}</td>
+                      <td className="py-3 text-gray-300">
+                        ${(item.productPrice * item.quantity).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="mt-4">
+                <p className="text-gray-300">Status: {order.status}</p>
+                <p className="text-gray-300">
+                  Date: {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+                <div className="mt-2 text-xl font-semibold text-gray-300 text-right">
+                  Total Cost: $
+                  {order.items
+                    .reduce((acc, item) => acc + item.productPrice * item.quantity, 0)
+                    .toFixed(2)}
+                </div>
+              </div>
             </div>
           ))}
         </div>
