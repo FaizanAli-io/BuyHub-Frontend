@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import { FaPowerOff } from "react-icons/fa"; // Importing power icon from react-icons
 
 function Navbar() {
   const { user, setUser } = useUser();
@@ -12,26 +13,41 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-gray-800 p-4">
+    <nav className="bg-gray-900 p-4 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-white text-xl">E-commerce Site</div>
-        <div className="space-x-4">
+        {/* Logo Section */}
+        <div className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+          Buy Hub
+        </div>
+
+        {/* Centered Navigation Menu */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-10 items-center">
           {user ? (
             <>
-              {/* Common Links for logged-in users */}
-              <Link to="/products" className="text-gray-300 hover:text-white">
+              <Link
+                to="/products"
+                className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+              >
                 Products
               </Link>
-              <Link to="/profile" className="text-gray-300 hover:text-white">
+              <Link
+                to="/profile"
+                className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+              >
                 Profile
               </Link>
-
               {user.role === "BUYER" ? (
                 <>
-                  <Link to="/cart" className="text-gray-300 hover:text-white">
+                  <Link
+                    to="/cart"
+                    className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+                  >
                     My Cart
                   </Link>
-                  <Link to="/orders" className="text-gray-300 hover:text-white">
+                  <Link
+                    to="/orders"
+                    className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+                  >
                     My Orders
                   </Link>
                 </>
@@ -39,53 +55,64 @@ function Navbar() {
                 <>
                   <Link
                     to="/add-product"
-                    className="text-gray-300 hover:text-white"
+                    className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
                   >
                     Add Product
                   </Link>
                   <Link
                     to="/inventory"
-                    className="text-gray-300 hover:text-white"
+                    className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
                   >
                     Inventory
                   </Link>
                 </>
               ) : (
-                user.role === "ADMIN" && ( // Check for ADMIN role
+                user.role === "ADMIN" && (
                   <>
                     <Link
                       to="/users"
-                      className="text-gray-300 hover:text-white"
+                      className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
                     >
                       All Users
                     </Link>
                     <Link
                       to="/categories"
-                      className="text-gray-300 hover:text-white"
+                      className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
                     >
                       Categories
                     </Link>
                   </>
                 )
               )}
-              {/* Logout Link */}
-              <button
-                onClick={handleLogout}
-                className="text-gray-300 hover:text-white"
-              >
-                Logout
-              </button>
             </>
           ) : (
-            // Links for not logged-in users
             <>
-              <Link to="/login" className="text-gray-300 hover:text-white">
+              <Link
+                to="/login"
+                className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+              >
                 Login
               </Link>
-              <Link to="/signup" className="text-gray-300 hover:text-white">
+              <Link
+                to="/signup"
+                className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+              >
                 Sign Up
               </Link>
             </>
+          )}
+        </div>
+
+        {/* Logout or Authentication Buttons */}
+        <div>
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="text-red-500 hover:text-red-700 text-lg font-medium"
+              title="Logout"
+            >
+              <FaPowerOff className="text-2xl" />
+            </button>
           )}
         </div>
       </div>
