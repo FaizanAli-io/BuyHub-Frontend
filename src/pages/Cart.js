@@ -2,15 +2,16 @@ import React from "react";
 import axios from "axios";
 import { useFetchData } from "../hooks/useFetchData";
 import { useUser } from "../context/UserContext";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = "http://localhost:3000";
 
 const Cart = () => {
   const { user } = useUser();
   const [cartItems, setCartItems] = useFetchData(`users/${user.id}/cart`);
-  const navigate = useNavigate(); // Initialize navigate for redirection
+  const navigate = useNavigate();
 
+  // Refresh cart items after deletion or checkout
   const refreshCart = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/users/${user.id}/cart`);
@@ -20,16 +21,29 @@ const Cart = () => {
     }
   };
 
+  // Checkout functionality
   const checkoutCart = async () => {
     try {
       await axios.post(`${BASE_URL}/orders`, { userId: user.id });
       refreshCart();
-      navigate("/orders"); // Redirect to the orders page after checkout
+      navigate("/orders"); // Redirect to orders page
     } catch (error) {
       console.error("Error during checkout:", error);
     }
   };
 
+  // Delete an item from the cart
+  const deleteCartItem = async (itemId) => {
+    try {
+      await axios.delete(`${BASE_URL}/carts/${itemId}`); // DELETE request to backend
+      console.log("Item deleted successfully:", itemId);
+      refreshCart(); // Refresh cart after deletion
+    } catch (error) {
+      console.error("Error deleting cart item:", error);
+    }
+  };
+
+  // Calculate the total cost
   const totalCost = cartItems
     .reduce((acc, item) => acc + item.product.price * item.quantity, 0)
     .toFixed(2);
@@ -51,6 +65,7 @@ const Cart = () => {
                   <th className="py-3 text-left">Price</th>
                   <th className="py-3 text-left">Quantity</th>
                   <th className="py-3 text-left">Total</th>
+                  <th className="py-3 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -63,6 +78,14 @@ const Cart = () => {
                     <td className="py-3 text-gray-300">{item.quantity}</td>
                     <td className="py-3 text-gray-300">
                       ${(item.product.price * item.quantity).toFixed(2)}
+                    </td>
+                    <td className="py-3 text-gray-300">
+                      <button
+                        onClick={() => deleteCartItem(item.id)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

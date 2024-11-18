@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { FaPowerOff } from "react-icons/fa"; // Importing power icon from react-icons
+import { VscAccount } from "react-icons/vsc"; // Importing profile icon
 
 function Navbar() {
   const { user, setUser } = useUser();
@@ -29,12 +30,6 @@ function Navbar() {
                 className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
               >
                 Products
-              </Link>
-              <Link
-                to="/profile"
-                className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
-              >
-                Profile
               </Link>
               {user.role === "BUYER" ? (
                 <>
@@ -103,16 +98,28 @@ function Navbar() {
           )}
         </div>
 
-        {/* Logout or Authentication Buttons */}
-        <div>
+        {/* Logout and Profile Section */}
+        <div className="flex items-center space-x-4">
           {user && (
-            <button
-              onClick={handleLogout}
-              className="text-red-500 hover:text-red-700 text-lg font-medium"
-              title="Logout"
-            >
-              <FaPowerOff className="text-2xl" />
-            </button>
+            <>
+              {/* Profile Icon and Name */}
+              <Link
+                to="/profile"
+                className="flex items-center space-x-2 text-gray-300 hover:text-green-400 transition-all duration-300"
+              >
+                <VscAccount className="text-2xl" />
+                <span className="text-lg font-medium">{user.name}</span>
+              </Link>
+
+              {/* Logout Icon */}
+              <button
+                onClick={handleLogout}
+                className="text-red-500 hover:text-red-700 text-lg font-medium ml-4" // Added margin-left (ml-4)
+                title="Logout"
+              >
+                <FaPowerOff className="text-2xl" />
+              </button>
+            </>
           )}
         </div>
       </div>
