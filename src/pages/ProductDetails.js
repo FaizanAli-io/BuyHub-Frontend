@@ -3,14 +3,32 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../context/UserContext";
 
+// You can use any date formatting library or JavaScript's built-in Date to format the date
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', options);  // Formats the date as: "January 1, 2024"
+};
+
 const BASE_URL = "http://localhost:3000";
 
 const ProductDetails = () => {
   const { user } = useUser();
-  const { id } = useParams();  // Get the product id from URL params
+  const { id } = useParams(); // Get the product id from URL params
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 0, content: "" });
+
+  // Function to fetch user by userId
+  const fetchUser = async (userId) => {
+    try {
+      const userResponse = await axios.get(`${BASE_URL}/users/${userId}`);
+      return userResponse.data.name;  // Assuming the user data has a 'name' field
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      return "Unknown User";
+    }
+  };
 
   useEffect(() => {
     // Fetch product details and relevant reviews based on productId
@@ -22,7 +40,15 @@ const ProductDetails = () => {
 
         // Fetch the reviews for this product
         const reviewsResponse = await axios.get(`${BASE_URL}/reviews?productId=${id}`);
-        setReviews(reviewsResponse.data);
+        // Fetch the username and date for each review and set it
+        const reviewsWithDetails = await Promise.all(
+          reviewsResponse.data.map(async (review) => {
+            const username = await fetchUser(review.userId);
+            const formattedDate = formatDate(review.createdAt);  // Format the date
+            return { ...review, username, formattedDate };
+          })
+        );
+        setReviews(reviewsWithDetails);
       } catch (error) {
         console.error("Error fetching product or reviews:", error);
       }
@@ -51,8 +77,15 @@ const ProductDetails = () => {
         content: newReview.content,
       });
 
-      // Add the new review to the list of reviews
-      setReviews((prevReviews) => [...prevReviews, response.data]);
+      // Add the new review to the list of reviews, including the username and date
+      const username = await fetchUser(user.id);
+      const formattedDate = formatDate(new Date());
+      const newReviewWithDetails = { 
+        ...response.data, 
+        username, 
+        formattedDate 
+      };
+      setReviews((prevReviews) => [...prevReviews, newReviewWithDetails]);
       setNewReview({ rating: 0, content: "" }); // Reset review form
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -81,6 +114,8 @@ const ProductDetails = () => {
                 <li key={review.id} className="p-4 bg-gray-800 rounded-lg">
                   <p className="text-lg font-semibold">Rating: {review.rating}/5</p>
                   <p className="text-gray-300 mt-2">{review.content}</p>
+                  <p className="text-sm text-gray-500 mt-2">By: {review.username}</p>
+                  <p className="text-sm text-gray-500 mt-2">Posted on: {review.formattedDate}</p> {/* Display formatted date */}
                 </li>
               )
             ))}
