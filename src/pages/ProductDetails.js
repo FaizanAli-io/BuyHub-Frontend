@@ -1,28 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useFetchData } from '../hooks/useFetchData';
 import { useUser } from "../context/UserContext";
 
 const BASE_URL = "http://localhost:3000";
 
 const ProductDetails = () => {
   const { user } = useUser();
-  const { id } = useParams();
+  const { id } = useParams();  // Get the product id from URL params
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 0, content: "" });
 
-  // Fetch the user data using your custom hook
-  // Assuming this endpoint fetches current logged-in user
-
   useEffect(() => {
-    // Fetch product details
-    const fetchProduct = async () => {
+    // Fetch product details and relevant reviews based on productId
+    const fetchProductAndReviews = async () => {
       try {
+        // Fetch the product details
         const productResponse = await axios.get(`${BASE_URL}/products/${id}`);
         setProduct(productResponse.data);
 
+        // Fetch the reviews for this product
         const reviewsResponse = await axios.get(`${BASE_URL}/reviews?productId=${id}`);
         setReviews(reviewsResponse.data);
       } catch (error) {
@@ -30,9 +28,10 @@ const ProductDetails = () => {
       }
     };
 
-    fetchProduct();
-  }, [id]);
+    fetchProductAndReviews();
+  }, [id]);  // Run this effect when the product id changes
 
+  // Handle submitting a review
   const handleReviewSubmit = async () => {
     if (!user) {
       alert("You must be logged in to submit a review.");
@@ -46,20 +45,21 @@ const ProductDetails = () => {
 
     try {
       const response = await axios.post(`${BASE_URL}/reviews`, {
-        userId: user.id,  // Use the dynamic user ID fetched from the API
-        productId: id,     // Pass the current product ID
+        userId: user.id,  // User's ID
+        productId: id,     // The current product ID
         rating: newReview.rating,
         content: newReview.content,
       });
 
-      // Add the newly created review to the list
+      // Add the new review to the list of reviews
       setReviews((prevReviews) => [...prevReviews, response.data]);
-      setNewReview({ rating: 0, content: "" }); // Reset the form
+      setNewReview({ rating: 0, content: "" }); // Reset review form
     } catch (error) {
       console.error("Error submitting review:", error);
     }
   };
 
+  // If product is still being fetched, show loading message
   if (!product) {
     return <p>Loading product details...</p>;
   }
@@ -77,10 +77,12 @@ const ProductDetails = () => {
         {reviews.length > 0 ? (
           <ul className="space-y-4">
             {reviews.map((review) => (
-              <li key={review.id} className="p-4 bg-gray-800 rounded-lg">
-                <p className="text-lg font-semibold">Rating: {review.rating}/5</p>
-                <p className="text-gray-300 mt-2">{review.content}</p>
-              </li>
+              review.productId === Number(id) && (
+                <li key={review.id} className="p-4 bg-gray-800 rounded-lg">
+                  <p className="text-lg font-semibold">Rating: {review.rating}/5</p>
+                  <p className="text-gray-300 mt-2">{review.content}</p>
+                </li>
+              )
             ))}
           </ul>
         ) : (
