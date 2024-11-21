@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const BASE_URL = "http://localhost:3000";
 
 const ProductCard = ({ product, user }) => {
+  const navigate = useNavigate();
   const [addQuantity, setAddQuantity] = useState(0);
   const [cartItem, setCartItem] = useState(null);
 
@@ -55,8 +57,15 @@ const ProductCard = ({ product, user }) => {
     }
   };
 
+  const handleNavigateToDetails = () => {
+    navigate(`/products/${product.id}`);
+  };
+
   return (
-    <div className="bg-gray-800 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105">
+    <div
+      className="bg-gray-800 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer"
+      onClick={handleNavigateToDetails} // Redirect on click
+    >
       <h3 className="text-xl font-bold text-white">{product.name}</h3>
       <p className="text-gray-300">{product.description}</p>
       <p className="text-gray-200">Price: ${product.price.toFixed(2)}</p>
@@ -70,6 +79,7 @@ const ProductCard = ({ product, user }) => {
               min="0"
               max={product.quantity}
               value={addQuantity}
+              onClick={(e) => e.stopPropagation()} // Prevent navigation on input click
               onChange={(e) =>
                 setAddQuantity(
                   Math.max(
@@ -82,14 +92,20 @@ const ProductCard = ({ product, user }) => {
             />
             {cartItem ? (
               <button
-                onClick={handleUpdateCart}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent navigation on button click
+                  handleUpdateCart();
+                }}
                 className="ml-2 px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 transition"
               >
                 Update Cart
               </button>
             ) : (
               <button
-                onClick={handleAddToCart}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent navigation on button click
+                  handleAddToCart();
+                }}
                 className="ml-2 px-4 py-1 text-white bg-green-500 rounded hover:bg-green-600 transition"
               >
                 Add to Cart

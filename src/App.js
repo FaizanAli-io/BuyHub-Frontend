@@ -14,6 +14,7 @@ import Cart from "./pages/Cart"; // Import Cart page
 import Orders from "./pages/Orders"; // Import Orders page
 import AddProduct from "./pages/AddProduct"; // Import AddProduct page
 import Inventory from "./pages/Inventory"; // Import Inventory page
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   return (
@@ -32,6 +33,8 @@ function App() {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/users" element={<AllUsers />} />{" "}
           <Route path="/categories" element={<Categories />} />{" "}
+          <Route path="/" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
         </Routes>
       </Router>
     </UserProvider>

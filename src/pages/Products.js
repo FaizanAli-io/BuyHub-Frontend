@@ -3,8 +3,16 @@ import { useUser } from "../context/UserContext";
 import { useFetchData } from "../hooks/useFetchData";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
-import { IoArrowBackCircle } from "react-icons/io5"; // Import the icon
-import { FaTshirt, FaCouch, FaShoePrints, FaMobileAlt, FaSprayCan, FaBath } from "react-icons/fa"; // Import icons
+import ProductSorter from "../components/ProductSorter"; // Import the sorter component
+import { IoArrowBackCircle } from "react-icons/io5";
+import {
+  FaTshirt,
+  FaCouch,
+  FaShoePrints,
+  FaMobileAlt,
+  FaSprayCan,
+  FaBath,
+} from "react-icons/fa";
 
 function Products() {
   const { user } = useUser();
@@ -13,8 +21,28 @@ function Products() {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("default"); // New state for sorting
 
-  // Map category names to icons
+  // Sorting logic
+  const sortProducts = (products) => {
+    if (sortOption === "high-to-low") {
+      return [...products].sort((a, b) => b.price - a.price);
+    } else if (sortOption === "low-to-high") {
+      return [...products].sort((a, b) => a.price - b.price);
+    } else if (sortOption === "alphabetical-a-z") {
+      return [...products].sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+      );
+    } else if (sortOption === "alphabetical-z-a") {
+      return [...products].sort((a, b) =>
+        b.name.localeCompare(a.name, undefined, { sensitivity: "base" })
+      );
+    }
+    return products;
+  };
+
+  const handleSortChange = (e) => setSortOption(e.target.value);
+
   const categoryIcons = {
     furniture: <FaCouch className="text-cyan-400 text-4xl" />,
     apparel: <FaTshirt className="text-cyan-400 text-4xl" />,
@@ -24,25 +52,21 @@ function Products() {
     cosmetics: <FaBath className="text-cyan-400 text-4xl" />,
   };
 
-  // Handle category selection
-  const handleCategoryClick = (categoryId) => {
-    setSelectedCategory(categoryId);
-  };
+  const handleCategoryClick = (categoryId) => setSelectedCategory(categoryId);
+  const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
-  // Handle search term change
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  // Filter categories and products based on the search term
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredProducts = products.filter((product) =>
-    (selectedCategory === null || product.categoryId === Number(selectedCategory)) &&
-    (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredProducts = sortProducts(
+    products.filter(
+      (product) =>
+        (selectedCategory === null ||
+          product.categoryId === Number(selectedCategory)) &&
+        (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
   );
 
   return (
@@ -52,14 +76,28 @@ function Products() {
       </h2>
 
       {/* Search Bar */}
-      <div className="w-full max-w-lg mx-auto mb-8">
-        <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+      <div className="w-full max-w-2xl mx-auto mb-8">
+        <SearchBar
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          placeholder={
+            selectedCategory === null ? "Search categories" : "Search products"
+          } // Dynamic placeholder
+        />
       </div>
 
-      {/* Categories or Products */}
+      {/* Sorter */}
+      {selectedCategory !== null && (
+        <div className="w-full max-w-2xl mx-auto mb-8">
+          <ProductSorter
+            filterValue={sortOption}
+            onFilterChange={handleSortChange}
+          />
+        </div>
+      )}
+
       {selectedCategory === null ? (
         <div>
-          {/* Display categories based on the search term */}
           {filteredCategories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {filteredCategories.map((category) => (
@@ -68,11 +106,12 @@ function Products() {
                   className="cursor-pointer border-2 border-gray-600 rounded-lg p-4 flex flex-col items-center hover:border-cyan-400 transition"
                   onClick={() => handleCategoryClick(category.id)}
                 >
-                  {/* Display Icon Based on Category */}
                   {categoryIcons[category.name.toLowerCase()] || (
                     <div className="text-cyan-400 text-4xl">?</div>
                   )}
-                  <p className="text-white text-lg font-semibold mt-4">{category.name}</p>
+                  <p className="text-white text-lg font-semibold mt-4">
+                    {category.name}
+                  </p>
                 </div>
               ))}
             </div>
@@ -88,11 +127,10 @@ function Products() {
             className="flex items-center gap-2 cursor-pointer text-cyan-400 hover:text-cyan-600 transition mb-4"
             onClick={() => setSelectedCategory(null)}
           >
-            <IoArrowBackCircle size={32} /> {/* Back Icon */}
+            <IoArrowBackCircle size={32} />
             <span className="text-lg font-medium">Back to Categories</span>
           </div>
 
-          {/* Display filtered products */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
