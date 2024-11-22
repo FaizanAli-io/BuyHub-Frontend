@@ -15,8 +15,12 @@ function Profile() {
     );
   }
 
+  const formattedCreatedAt = new Date(user.createdAt).toLocaleString();
+  const formattedUpdatedAt = new Date(user.updatedAt).toLocaleString();
+  const hiddenDate = "10/27/2024, 3:37:01 AM";
+
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gray-900 text-gray-100">
       {/* Art Design Section */}
       <div className="relative h-64 overflow-hidden bg-gray-900">
         {/* Background Art Design */}
@@ -52,26 +56,30 @@ function Profile() {
       </div>
 
       {/* User Info Section */}
-      <div className="max-w-4xl mx-auto bg-gray-800 text-gray-300 shadow-lg rounded-lg p-8 mt-16">
-        <h2 className="text-3xl font-bold text-center text-blue-400">
+      <div className="max-w-4xl mx-auto bg-gray-800 shadow-lg rounded-lg p-8 mt-16">
+        <h2 className="text-4xl font-extrabold text-center text-blue-400 mb-2">
           {user.name}
         </h2>
-        <p className="text-center text-gray-400 mb-4">{user.role}</p>
-        <div className="grid grid-cols-1 gap-y-4 text-lg">
-          <p>
-            <strong className="text-gray-500">ID:</strong> {user.id}
+        <p className="text-center text-gray-400 mb-8 text-lg italic">
+          {user.role}
+        </p>
+        <div className="grid grid-cols-1 gap-y-6 text-lg">
+          <p className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all">
+            <strong className="block text-gray-400 uppercase text-sm">Email</strong>
+            <span className="text-gray-300">{user.email}</span>
           </p>
-          <p>
-            <strong className="text-gray-500">Email:</strong> {user.email}
-          </p>
-          <p>
-            <strong className="text-gray-500">Created At:</strong>{" "}
-            {new Date(user.createdAt).toLocaleString()}
-          </p>
-          <p>
-            <strong className="text-gray-500">Updated At:</strong>{" "}
-            {new Date(user.updatedAt).toLocaleString()}
-          </p>
+          {formattedCreatedAt !== hiddenDate && (
+            <p className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all">
+              <strong className="block text-gray-400 uppercase text-sm">Joined On</strong>
+              <span className="text-gray-300">{formattedCreatedAt}</span>
+            </p>
+          )}
+          {formattedUpdatedAt !== hiddenDate && (
+            <p className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all">
+              <strong className="block text-gray-400 uppercase text-sm">Last Updated</strong>
+              <span className="text-gray-300">{formattedUpdatedAt}</span>
+            </p>
+          )}
         </div>
       </div>
     </div>

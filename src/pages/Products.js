@@ -3,16 +3,9 @@ import { useUser } from "../context/UserContext";
 import { useFetchData } from "../hooks/useFetchData";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
-import ProductSorter from "../components/ProductSorter"; // Import the sorter component
+import ProductSorter from "../components/ProductSorter";
 import { IoArrowBackCircle } from "react-icons/io5";
-import {
-  FaTshirt,
-  FaCouch,
-  FaShoePrints,
-  FaMobileAlt,
-  FaSprayCan,
-  FaBath,
-} from "react-icons/fa";
+import { FaEye, FaTshirt, FaCouch, FaShoePrints, FaMobileAlt, FaSprayCan, FaBath } from "react-icons/fa";
 
 function Products() {
   const { user } = useUser();
@@ -21,9 +14,9 @@ function Products() {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState("default"); // New state for sorting
+  const [sortOption, setSortOption] = useState("default");
+  const [showAllProducts, setShowAllProducts] = useState(false);
 
-  // Sorting logic
   const sortProducts = (products) => {
     if (sortOption === "high-to-low") {
       return [...products].sort((a, b) => b.price - a.price);
@@ -52,7 +45,11 @@ function Products() {
     cosmetics: <FaBath className="text-cyan-400 text-4xl" />,
   };
 
-  const handleCategoryClick = (categoryId) => setSelectedCategory(categoryId);
+  const handleCategoryClick = (categoryId) => {
+    setSelectedCategory(categoryId);
+    setShowAllProducts(false);
+  };
+
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
   const filteredCategories = categories.filter((category) =>
@@ -62,8 +59,9 @@ function Products() {
   const filteredProducts = sortProducts(
     products.filter(
       (product) =>
-        (selectedCategory === null ||
-          product.categoryId === Number(selectedCategory)) &&
+        (showAllProducts ||
+          (selectedCategory === null ||
+            product.categoryId === Number(selectedCategory))) &&
         (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
@@ -81,13 +79,15 @@ function Products() {
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           placeholder={
-            selectedCategory === null ? "Search categories" : "Search products"
-          } // Dynamic placeholder
+            selectedCategory === null && !showAllProducts
+              ? "Search categories"
+              : "Search products"
+          }
         />
       </div>
 
       {/* Sorter */}
-      {selectedCategory !== null && (
+      {selectedCategory !== null && !showAllProducts && (
         <div className="w-full max-w-2xl mx-auto mb-8">
           <ProductSorter
             filterValue={sortOption}
@@ -96,7 +96,40 @@ function Products() {
         </div>
       )}
 
-      {selectedCategory === null ? (
+      {/* Show All Products Button */}
+      {!showAllProducts && (
+        <div className="flex justify-center mb-8">
+          <button
+            className="flex items-center gap-2 bg-cyan-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-cyan-600 transition duration-200 text-lg font-medium"
+            onClick={() => {
+              setShowAllProducts(true);
+              setSelectedCategory(null);
+            }}
+          >
+            <FaEye size={20} />
+            Show All Products
+          </button>
+        </div>
+      )}
+
+      {/* Back Button */}
+      {showAllProducts && (
+        <div className="flex justify-start mb-8">
+          <button
+            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-600 transition text-lg font-medium"
+            onClick={() => {
+              setShowAllProducts(false);
+              setSearchTerm(""); // Clear search
+            }}
+          >
+            <IoArrowBackCircle size={32} />
+            Back to Categories
+          </button>
+        </div>
+      )}
+
+      {/* Categories or Products */}
+      {selectedCategory === null && !showAllProducts ? (
         <div>
           {filteredCategories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
@@ -123,13 +156,15 @@ function Products() {
         </div>
       ) : (
         <div>
-          <div
-            className="flex items-center gap-2 cursor-pointer text-cyan-400 hover:text-cyan-600 transition mb-4"
-            onClick={() => setSelectedCategory(null)}
-          >
-            <IoArrowBackCircle size={32} />
-            <span className="text-lg font-medium">Back to Categories</span>
-          </div>
+          {!showAllProducts && (
+            <div
+              className="flex items-center gap-2 cursor-pointer text-cyan-400 hover:text-cyan-600 transition mb-4"
+              onClick={() => setSelectedCategory(null)}
+            >
+              <IoArrowBackCircle size={32} />
+              <span className="text-lg font-medium">Back to Categories</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {filteredProducts.length > 0 ? (

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../context/UserContext";
+import { FaStar } from "react-icons/fa";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -89,6 +90,15 @@ const ProductDetails = () => {
     }
   };
 
+  const renderStars = (rating) =>
+    Array.from({ length: 5 }, (_, index) => (
+      <FaStar
+        key={index}
+        size={20}
+        className={index < rating ? "text-yellow-400" : "text-gray-400"}
+      />
+    ));
+
   if (!product) {
     return <p>Loading product details...</p>;
   }
@@ -99,6 +109,11 @@ const ProductDetails = () => {
       ).toFixed(1)
     : null;
 
+  const ratingDistribution = [0, 0, 0, 0, 0];
+  reviews.forEach((review) => {
+    ratingDistribution[review.rating - 1]++;
+  });
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <h1 className="text-3xl font-bold">{product.name}</h1>
@@ -108,24 +123,50 @@ const ProductDetails = () => {
 
       <div className="mt-8">
         <h2 className="text-2xl font-semibold mb-4">Customer Reviews</h2>
+
         {averageRating && (
-          <p className="text-lg font-semibold mb-4">
-            Average Rating: {averageRating} ({reviews.length})
-          </p>
+          <div className="mb-6">
+            <p className="text-3xl font-bold">
+              Average Rating: {averageRating}
+            </p>
+            <p className="text-gray-400">({reviews.length} reviews)</p>
+          </div>
         )}
+
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-2">Rating Distribution</h3>
+          {ratingDistribution.map((count, index) => (
+            <div key={index} className="flex items-center mb-2">
+              <p className="w-10">{5 - index} Star</p>
+              <div className="flex-grow bg-gray-700 h-4 rounded-md overflow-hidden">
+                <div
+                  className="bg-yellow-400 h-4"
+                  style={{
+                    width: `${(count / reviews.length) * 100}%`,
+                  }}
+                ></div>
+              </div>
+              <p className="w-12 ml-2 text-right">{count}</p>
+            </div>
+          ))}
+        </div>
+
         {reviews.length > 0 ? (
           <ul className="space-y-4">
             {reviews.map((review) => (
-              <li key={review.id} className="p-4 bg-gray-800 rounded-lg">
-                <p className="text-lg font-semibold">
-                  Rating: {review.rating}/5
-                </p>
-                <p className="text-gray-300 mt-2">{review.content}</p>
-                <p className="text-sm text-gray-500 mt-2">
+              <li
+                key={review.id}
+                className="p-4 bg-gray-800 rounded-lg shadow-md"
+              >
+                <div className="flex items-center mb-2">
+                  {renderStars(review.rating)}
+                  <p className="ml-2 text-sm text-gray-500">
+                    {review.formattedDate}
+                  </p>
+                </div>
+                <p className="text-lg font-semibold">{review.content}</p>
+                <p className="text-sm text-gray-500 mt-1">
                   By: {review.username}
-                </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Posted on: {review.formattedDate}
                 </p>
               </li>
             ))}
@@ -147,21 +188,23 @@ const ProductDetails = () => {
           className="space-y-4"
         >
           <div>
-            <label htmlFor="rating" className="block text-gray-400 mb-2">
-              Rating (1-5):
-            </label>
-            <input
-              type="number"
-              id="rating"
-              value={newReview.rating}
-              onChange={(e) =>
-                setNewReview({ ...newReview, rating: Number(e.target.value) })
-              }
-              min="1"
-              max="5"
-              required
-              className="p-2 rounded bg-gray-700 text-white w-full"
-            />
+            <label className="block text-gray-400 mb-2">Rating:</label>
+            <div className="flex items-center">
+              {Array.from({ length: 5 }, (_, index) => (
+                <FaStar
+                  key={index}
+                  size={30}
+                  className={
+                    index < newReview.rating
+                      ? "text-yellow-400 cursor-pointer"
+                      : "text-gray-400 cursor-pointer"
+                  }
+                  onClick={() =>
+                    setNewReview({ ...newReview, rating: index + 1 })
+                  }
+                />
+              ))}
+            </div>
           </div>
           <div>
             <label htmlFor="content" className="block text-gray-400 mb-2">
