@@ -5,7 +5,15 @@ import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import ProductSorter from "../components/ProductSorter";
 import { IoArrowBackCircle } from "react-icons/io5";
-import { FaEye, FaTshirt, FaCouch, FaShoePrints, FaMobileAlt, FaSprayCan, FaBath } from "react-icons/fa";
+import {
+  FaEye,
+  FaTshirt,
+  FaCouch,
+  FaShoePrints,
+  FaMobileAlt,
+  FaSprayCan,
+  FaBath,
+} from "react-icons/fa";
 
 function Products() {
   const { user } = useUser();
@@ -18,39 +26,37 @@ function Products() {
   const [showAllProducts, setShowAllProducts] = useState(false);
 
   const sortProducts = (products) => {
-    if (sortOption === "high-to-low") {
-      return [...products].sort((a, b) => b.price - a.price);
-    } else if (sortOption === "low-to-high") {
-      return [...products].sort((a, b) => a.price - b.price);
-    } else if (sortOption === "alphabetical-a-z") {
-      return [...products].sort((a, b) =>
-        a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
-      );
-    } else if (sortOption === "alphabetical-z-a") {
-      return [...products].sort((a, b) =>
-        b.name.localeCompare(a.name, undefined, { sensitivity: "base" })
-      );
+    switch (sortOption) {
+      case "high-to-low":
+        return [...products].sort((a, b) => b.price - a.price);
+      case "low-to-high":
+        return [...products].sort((a, b) => a.price - b.price);
+      case "alphabetical-a-z":
+        return [...products].sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+        );
+      case "alphabetical-z-a":
+        return [...products].sort((a, b) =>
+          b.name.localeCompare(a.name, undefined, { sensitivity: "base" })
+        );
+      default:
+        return products;
     }
-    return products;
   };
 
-  const handleSortChange = (e) => setSortOption(e.target.value);
-
   const categoryIcons = {
-    furniture: <FaCouch className="text-cyan-400 text-4xl" />,
-    apparel: <FaTshirt className="text-cyan-400 text-4xl" />,
-    footwear: <FaShoePrints className="text-cyan-400 text-4xl" />,
-    electronics: <FaMobileAlt className="text-cyan-400 text-4xl" />,
-    perfume: <FaSprayCan className="text-cyan-400 text-4xl" />,
-    cosmetics: <FaBath className="text-cyan-400 text-4xl" />,
+    furniture: <FaCouch className="text-cyan-400 text-5xl" />,
+    apparel: <FaTshirt className="text-cyan-400 text-5xl" />,
+    footwear: <FaShoePrints className="text-cyan-400 text-5xl" />,
+    electronics: <FaMobileAlt className="text-cyan-400 text-5xl" />,
+    perfume: <FaSprayCan className="text-cyan-400 text-5xl" />,
+    cosmetics: <FaBath className="text-cyan-400 text-5xl" />,
   };
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
     setShowAllProducts(false);
   };
-
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
 
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -68,30 +74,30 @@ function Products() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black p-8">
-      <h2 className="text-4xl font-semibold text-center text-cyan-400 mb-8">
-        Browse Our Products
+    <div className="min-h-screen bg-gradient-to-bl from-gray-800 via-gray-900 to-black p-8">
+      <h2 className="text-4xl font-bold text-center text-cyan-400 mb-10">
+        Explore Our Products
       </h2>
 
       {/* Search Bar */}
-      <div className="w-full max-w-2xl mx-auto mb-8">
+      <div className="w-full max-w-3xl mx-auto mb-8">
         <SearchBar
           searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
           placeholder={
             selectedCategory === null && !showAllProducts
-              ? "Search categories"
-              : "Search products"
+              ? "Search categories..."
+              : "Search products..."
           }
         />
       </div>
 
       {/* Sorter */}
-      {selectedCategory !== null && !showAllProducts && (
-        <div className="w-full max-w-2xl mx-auto mb-8">
+      {(selectedCategory !== null || showAllProducts) && (
+        <div className="w-full max-w-3xl mx-auto mb-8">
           <ProductSorter
             filterValue={sortOption}
-            onFilterChange={handleSortChange}
+            onFilterChange={(e) => setSortOption(e.target.value)}
           />
         </div>
       )}
@@ -100,7 +106,7 @@ function Products() {
       {!showAllProducts && (
         <div className="flex justify-center mb-8">
           <button
-            className="flex items-center gap-2 bg-cyan-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-cyan-600 transition duration-200 text-lg font-medium"
+            className="flex items-center gap-2 bg-cyan-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-cyan-700 transition duration-200 text-lg font-medium"
             onClick={() => {
               setShowAllProducts(true);
               setSelectedCategory(null);
@@ -116,10 +122,10 @@ function Products() {
       {showAllProducts && (
         <div className="flex justify-start mb-8">
           <button
-            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-600 transition text-lg font-medium"
+            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-500 transition text-lg font-medium"
             onClick={() => {
               setShowAllProducts(false);
-              setSearchTerm(""); // Clear search
+              setSearchTerm("");
             }}
           >
             <IoArrowBackCircle size={32} />
@@ -132,15 +138,15 @@ function Products() {
       {selectedCategory === null && !showAllProducts ? (
         <div>
           {filteredCategories.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {filteredCategories.map((category) => (
                 <div
                   key={category.id}
-                  className="cursor-pointer border-2 border-gray-600 rounded-lg p-4 flex flex-col items-center hover:border-cyan-400 transition"
+                  className="cursor-pointer border-2 border-gray-700 rounded-lg p-6 flex flex-col items-center hover:border-cyan-400 hover:scale-105 transition-transform duration-200"
                   onClick={() => handleCategoryClick(category.id)}
                 >
                   {categoryIcons[category.name.toLowerCase()] || (
-                    <div className="text-cyan-400 text-4xl">?</div>
+                    <div className="text-cyan-400 text-5xl">?</div>
                   )}
                   <p className="text-white text-lg font-semibold mt-4">
                     {category.name}
@@ -158,7 +164,7 @@ function Products() {
         <div>
           {!showAllProducts && (
             <div
-              className="flex items-center gap-2 cursor-pointer text-cyan-400 hover:text-cyan-600 transition mb-4"
+              className="flex items-center gap-2 cursor-pointer text-cyan-400 hover:text-cyan-500 transition mb-6"
               onClick={() => setSelectedCategory(null)}
             >
               <IoArrowBackCircle size={32} />
@@ -166,7 +172,7 @@ function Products() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} user={user} />
