@@ -2,10 +2,10 @@ import React from "react";
 
 function ProductSorter({ filterValue, onFilterChange }) {
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-2">
+    <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
       <label
         htmlFor="product-sorter"
-        className="text-sm font-medium text-gray-300"
+        className="text-lg sm:text-xl font-medium text-gray-300"
       >
         Sort by:
       </label>
@@ -13,7 +13,7 @@ function ProductSorter({ filterValue, onFilterChange }) {
         id="product-sorter"
         value={filterValue}
         onChange={onFilterChange}
-        className="block w-full sm:w-auto bg-gray-800 text-gray-300 text-sm rounded-md border border-gray-700 focus:ring-2 focus:ring-cyan-400 focus:outline-none px-4 py-2"
+        className="text-lg sm:text-xl w-full sm:w-auto bg-gray-800 text-gray-300 rounded-md border border-gray-700 focus:ring-2 focus:ring-cyan-400 focus:outline-none px-4 py-3"
       >
         <option value="default" disabled hidden>
           Select an option
