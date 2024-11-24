@@ -4,31 +4,29 @@ import { useFetchData } from "../hooks/useFetchData";
 import ProductCard from "../components/ProductCard";
 import CategoryFilter from "../components/CategoryFilter";
 import ProductSorter from "../components/ProductSorter";
-import SearchBar from "../components/SearchBar"; // Import the SearchBar component
+import SearchBar from "../components/SearchBar";
 
 const Inventory = () => {
   const { user } = useUser();
-  const products = useFetchData(`users/${user.id}/products`)[0];
+  const products = useFetchData(`products/user/${user.id}`)[0];
   const categories = useFetchData("categories")[0];
 
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortOption, setSortOption] = useState("default");
-  const [searchTerm, setSearchTerm] = useState(""); // State to store search term
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Filter products by category
   const filteredProductsByCategory = selectedCategory
     ? products.filter(
         (product) => product.categoryId === Number(selectedCategory)
       )
     : products;
 
-  // Filter products by search term (case-insensitive)
-  const filteredProductsBySearch = filteredProductsByCategory.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProductsBySearch = filteredProductsByCategory.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Sorting products based on the selected option
   const sortedProducts = [...filteredProductsBySearch].sort((a, b) => {
     switch (sortOption) {
       case "high-to-low":
@@ -36,20 +34,18 @@ const Inventory = () => {
       case "low-to-high":
         return a.price - b.price;
       case "alphabetical-a-z":
-        return a.name.localeCompare(b.name); // Sorting alphabetically A-Z
+        return a.name.localeCompare(b.name);
       case "alphabetical-z-a":
-        return b.name.localeCompare(a.name); // Sorting alphabetically Z-A
+        return b.name.localeCompare(a.name);
       default:
         return 0;
     }
   });
 
-  // Handle sort option change
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
   };
 
-  // Handle search term change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
@@ -73,12 +69,18 @@ const Inventory = () => {
 
         {/* Search Bar - Centered and Large */}
         <div className="w-full max-w-lg">
-          <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+          />
         </div>
 
         {/* Product Sorter */}
         <div className="w-full lg:w-auto flex-shrink-0">
-          <ProductSorter filterValue={sortOption} onFilterChange={handleSortChange} />
+          <ProductSorter
+            filterValue={sortOption}
+            onFilterChange={handleSortChange}
+          />
         </div>
       </div>
 

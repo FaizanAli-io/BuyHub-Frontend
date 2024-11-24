@@ -8,42 +8,38 @@ const BASE_URL = "http://localhost:3000";
 
 const Cart = () => {
   const { user } = useUser();
-  const [cartItems, setCartItems] = useFetchData(`users/${user.id}/cart`);
+  const [cartItems, setCartItems] = useFetchData(`cartitems/user/${user.id}`);
   const navigate = useNavigate();
 
-  // Refresh cart items after deletion or checkout
   const refreshCart = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/users/${user.id}/cart`);
+      const response = await axios.get(`${BASE_URL}/cartitems/user/${user.id}`);
       setCartItems(response.data);
     } catch (error) {
       console.error("Error refreshing cart:", error);
     }
   };
 
-  // Checkout functionality
   const checkoutCart = async () => {
     try {
       await axios.post(`${BASE_URL}/orders`, { userId: user.id });
       refreshCart();
-      navigate("/orders"); // Redirect to orders page
+      navigate("/orders");
     } catch (error) {
       console.error("Error during checkout:", error);
     }
   };
 
-  // Delete an item from the cart
   const deleteCartItem = async (itemId) => {
     try {
-      await axios.delete(`${BASE_URL}/carts/${itemId}`); // DELETE request to backend
+      await axios.delete(`${BASE_URL}/cartitems/${itemId}`);
       console.log("Item deleted successfully:", itemId);
-      refreshCart(); // Refresh cart after deletion
+      refreshCart();
     } catch (error) {
       console.error("Error deleting cart item:", error);
     }
   };
 
-  // Calculate the total cost
   const totalCost = cartItems
     .reduce((acc, item) => acc + item.product.price * item.quantity, 0)
     .toFixed(2);

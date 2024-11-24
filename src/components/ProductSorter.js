@@ -22,6 +22,8 @@ function ProductSorter({ filterValue, onFilterChange }) {
         <option value="low-to-high">(Price) Lowest to highest</option>
         <option value="alphabetical-a-z">Alphabetical (A-Z)</option>
         <option value="alphabetical-z-a">Alphabetical (Z-A)</option>
+        <option value="newest-to-oldest">Newest to Oldest</option>
+        <option value="oldest-to-newest">Oldest to Newest</option>
       </select>
     </div>
   );

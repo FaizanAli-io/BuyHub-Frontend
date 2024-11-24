@@ -39,7 +39,7 @@ const ProductDetails = () => {
         setProduct(productResponse.data);
 
         const reviewsResponse = await axios.get(
-          `${BASE_URL}/products/${id}/reviews`
+          `${BASE_URL}/reviews/product/${id}`
         );
         const reviewsWithDetails = await Promise.all(
           reviewsResponse.data.map(async (review) => {
@@ -100,7 +100,9 @@ const ProductDetails = () => {
     ));
 
   if (!product) {
-    return <p className="text-center text-white mt-10">Loading product details...</p>;
+    return (
+      <p className="text-center text-white mt-10">Loading product details...</p>
+    );
   }
 
   const averageRating = reviews.length
@@ -121,10 +123,11 @@ const ProductDetails = () => {
         <div className="p-6 bg-gray-800 rounded-lg shadow-lg">
           <h1 className="text-4xl font-extrabold mb-4">{product.name}</h1>
           <p className="text-lg text-gray-300 my-4">{product.description}</p>
-          <p className="text-2xl font-semibold">Price: ${product.price.toFixed(2)}</p>
+          <p className="text-2xl font-semibold">
+            Price: ${product.price.toFixed(2)}
+          </p>
           <p className="text-lg mt-2">Available: {product.quantity}</p>
         </div>
-
         {/* Customer Reviews */}
         <div className="mt-10">
           <h2 className="text-3xl font-bold mb-6">Customer Reviews</h2>
@@ -141,7 +144,7 @@ const ProductDetails = () => {
             <h3 className="text-xl font-semibold mb-4">Rating Distribution</h3>
             {ratingDistribution.map((count, index) => (
               <div key={index} className="flex items-center mb-3">
-                <p className="w-16">{5 - index} Star</p>
+                <p className="w-16">{index + 1} Star</p>
                 <div className="flex-grow bg-gray-700 h-4 rounded-full overflow-hidden">
                   <div
                     className="bg-yellow-400 h-full"
@@ -177,62 +180,66 @@ const ProductDetails = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-400">No reviews yet. Be the first to leave one!</p>
+            <p className="text-gray-400">
+              No reviews yet. Be the first to leave one!
+            </p>
           )}
         </div>
 
         {/* Add a Review */}
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleReviewSubmit();
-            }}
-            className="space-y-4"
-          >
-            <div>
-              <label className="block text-gray-400 mb-2">Rating:</label>
-              <div className="flex items-center">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <FaStar
-                    key={index}
-                    size={30}
-                    className={
-                      index < newReview.rating
-                        ? "text-yellow-400 cursor-pointer"
-                        : "text-gray-400 cursor-pointer"
-                    }
-                    onClick={() =>
-                      setNewReview({ ...newReview, rating: index + 1 })
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-            <div>
-              <label htmlFor="content" className="block text-gray-400 mb-2">
-                Review Content:
-              </label>
-              <textarea
-                id="content"
-                value={newReview.content}
-                onChange={(e) =>
-                  setNewReview({ ...newReview, content: e.target.value })
-                }
-                rows="4"
-                required
-                className="p-2 rounded bg-gray-700 text-white w-full"
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+        {user.role === "BUYER" && (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleReviewSubmit();
+              }}
+              className="space-y-4"
             >
-              Submit Review
-            </button>
-          </form>
-        </div>
+              <div>
+                <label className="block text-gray-400 mb-2">Rating:</label>
+                <div className="flex items-center">
+                  {Array.from({ length: 5 }, (_, index) => (
+                    <FaStar
+                      key={index}
+                      size={30}
+                      className={
+                        index < newReview.rating
+                          ? "text-yellow-400 cursor-pointer"
+                          : "text-gray-400 cursor-pointer"
+                      }
+                      onClick={() =>
+                        setNewReview({ ...newReview, rating: index + 1 })
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label htmlFor="content" className="block text-gray-400 mb-2">
+                  Review Content:
+                </label>
+                <textarea
+                  id="content"
+                  value={newReview.content}
+                  onChange={(e) =>
+                    setNewReview({ ...newReview, content: e.target.value })
+                  }
+                  rows="4"
+                  required
+                  className="p-2 rounded bg-gray-700 text-white w-full"
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+              >
+                Submit Review
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useUser } from "../context/UserContext"; // Ensure you have this context for user details
+import { useUser } from "../context/UserContext";
+import React, { useEffect, useState } from "react";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -11,20 +11,21 @@ function Orders() {
   useEffect(() => {
     const fetchOrdersWithProducts = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/users/${user.id}/orders`);
+        const response = await axios.get(`${BASE_URL}/orders/user/${user.id}`);
         const orders = response.data;
 
-        // Fetch product details for each item
         const ordersWithDetails = await Promise.all(
           orders.map(async (order) => {
             const itemsWithDetails = await Promise.all(
               order.items.map(async (item) => {
-                const productResponse = await axios.get(`${BASE_URL}/products/${item.productId}`);
+                const productResponse = await axios.get(
+                  `${BASE_URL}/products/${item.productId}`
+                );
                 return {
                   ...item,
-                  productName: productResponse.data.name, // Assume the API returns `name`
+                  productName: productResponse.data.name,
                   productDescription: productResponse.data.description,
-                  productPrice: productResponse.data.price, // Add price for total calculation
+                  productPrice: productResponse.data.price,
                 };
               })
             );
@@ -89,7 +90,10 @@ function Orders() {
                 <div className="mt-2 text-xl font-semibold text-gray-300 text-right">
                   Total Cost: $
                   {order.items
-                    .reduce((acc, item) => acc + item.productPrice * item.quantity, 0)
+                    .reduce(
+                      (acc, item) => acc + item.productPrice * item.quantity,
+                      0
+                    )
                     .toFixed(2)}
                 </div>
               </div>

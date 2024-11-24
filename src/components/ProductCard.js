@@ -30,12 +30,13 @@ const ProductCard = ({ product, user }) => {
     if (addQuantity > product.quantity) return;
 
     try {
-      await axios.post(`${BASE_URL}/carts`, {
+      const response = await axios.post(`${BASE_URL}/cartitems`, {
         userId: user.id,
         productId: product.id,
         quantity: addQuantity,
       });
-      setAddQuantity(0);
+
+      setCartItem(response.data);
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -46,9 +47,9 @@ const ProductCard = ({ product, user }) => {
 
     try {
       if (addQuantity === 0) {
-        await axios.delete(`${BASE_URL}/carts/${cartItem.id}`);
+        await axios.delete(`${BASE_URL}/cartitems/${cartItem.id}`);
       } else {
-        await axios.patch(`${BASE_URL}/carts/${cartItem.id}`, {
+        await axios.patch(`${BASE_URL}/cartitems/${cartItem.id}`, {
           quantity: addQuantity,
         });
       }
@@ -63,23 +64,32 @@ const ProductCard = ({ product, user }) => {
 
   return (
     <div
-      className="bg-gray-800 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 cursor-pointer"
-      onClick={handleNavigateToDetails} // Redirect on click
+      className="bg-gray-800 rounded-lg shadow-lg p-6 transition-all transform hover:scale-105 cursor-pointer hover:shadow-xl"
+      onClick={handleNavigateToDetails}
     >
-      <h3 className="text-xl font-bold text-white">{product.name}</h3>
-      <p className="text-gray-300">{product.description}</p>
-      <p className="text-gray-200">Price: ${product.price.toFixed(2)}</p>
-      <p className="text-gray-200">Available: {product.quantity}</p>
+      <div className="flex flex-col items-center justify-center mb-4">
+        <h3 className="text-2xl font-semibold text-white mb-2 hover:text-cyan-400 transition-colors">
+          {product.name}
+        </h3>
+        <p className="text-gray-300 text-center">{product.description}</p>
+      </div>
+
+      <div className="text-center mb-4">
+        <p className="text-gray-200 text-lg font-medium">
+          Price: ${product.price.toFixed(2)}
+        </p>
+        <p className="text-gray-400">Available: {product.quantity}</p>
+      </div>
 
       {user.role === "BUYER" && (
-        <div className="mt-4 border-t border-gray-600 pt-4">
-          <div className="flex items-center justify-between mt-2">
+        <div className="mt-4 border-t border-gray-700 pt-4">
+          <div className="flex items-center justify-between">
             <input
               type="number"
               min="0"
               max={product.quantity}
               value={addQuantity}
-              onClick={(e) => e.stopPropagation()} // Prevent navigation on input click
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) =>
                 setAddQuantity(
                   Math.max(
@@ -88,25 +98,26 @@ const ProductCard = ({ product, user }) => {
                   )
                 )
               }
-              className="w-16 p-1 border border-gray-600 rounded-md text-center bg-gray-700 text-white"
+              className="w-16 p-2 border border-gray-600 rounded-lg text-center bg-gray-700 text-white transition duration-200 focus:ring-2 focus:ring-cyan-400"
             />
+
             {cartItem ? (
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent navigation on button click
+                  e.stopPropagation();
                   handleUpdateCart();
                 }}
-                className="ml-2 px-4 py-1 text-white bg-blue-500 rounded hover:bg-blue-600 transition"
+                className="ml-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
               >
                 Update Cart
               </button>
             ) : (
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent navigation on button click
+                  e.stopPropagation();
                   handleAddToCart();
                 }}
-                className="ml-2 px-4 py-1 text-white bg-green-500 rounded hover:bg-green-600 transition"
+                className="ml-4 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-200"
               >
                 Add to Cart
               </button>

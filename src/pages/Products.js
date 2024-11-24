@@ -39,6 +39,14 @@ function Products() {
         return [...products].sort((a, b) =>
           b.name.localeCompare(a.name, undefined, { sensitivity: "base" })
         );
+      case "newest-to-oldest":
+        return [...products].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      case "oldest-to-newest":
+        return [...products].sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
       default:
         return products;
     }
@@ -49,7 +57,7 @@ function Products() {
     apparel: <FaTshirt className="text-cyan-400 text-5xl" />,
     footwear: <FaShoePrints className="text-cyan-400 text-5xl" />,
     electronics: <FaMobileAlt className="text-cyan-400 text-5xl" />,
-    perfume: <FaSprayCan className="text-cyan-400 text-5xl" />,
+    perfumes: <FaSprayCan className="text-cyan-400 text-5xl" />,
     cosmetics: <FaBath className="text-cyan-400 text-5xl" />,
   };
 
@@ -66,8 +74,8 @@ function Products() {
     products.filter(
       (product) =>
         (showAllProducts ||
-          (selectedCategory === null ||
-            product.categoryId === Number(selectedCategory))) &&
+          selectedCategory === null ||
+          product.categoryId === Number(selectedCategory)) &&
         (product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description.toLowerCase().includes(searchTerm.toLowerCase()))
     )
