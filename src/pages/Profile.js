@@ -1,9 +1,37 @@
-import React from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { FaShoppingBag } from "react-icons/fa";
 import { useUser } from "../context/UserContext";
-import { FaShoppingBag } from "react-icons/fa"; // E-commerce-related icon
+import BuyerAnalytics from "../components/BuyerAnalytics";
+import SellerAnalytics from "../components/SellerAnalytics";
+
+const BASE_URL = "http://localhost:3000";
 
 function Profile() {
   const { user } = useUser();
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${BASE_URL}/analytics/${user.role.toLowerCase()}/${user.id}`
+        );
+        setAnalytics(response.data);
+      } catch (err) {
+        setError("Error fetching analytics data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [user]);
 
   if (!user) {
     return (
@@ -63,22 +91,45 @@ function Profile() {
         <p className="text-center text-gray-400 mb-8 text-lg italic">
           {user.role}
         </p>
+
+        {/* Profile info */}
         <div className="grid grid-cols-1 gap-y-6 text-lg">
           <p className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all">
-            <strong className="block text-gray-400 uppercase text-sm">Email</strong>
+            <strong className="block text-gray-400 uppercase text-sm">
+              Email
+            </strong>
             <span className="text-gray-300">{user.email}</span>
           </p>
           {formattedCreatedAt !== hiddenDate && (
             <p className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all">
-              <strong className="block text-gray-400 uppercase text-sm">Joined On</strong>
+              <strong className="block text-gray-400 uppercase text-sm">
+                Joined On
+              </strong>
               <span className="text-gray-300">{formattedCreatedAt}</span>
             </p>
           )}
           {formattedUpdatedAt !== hiddenDate && (
             <p className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-all">
-              <strong className="block text-gray-400 uppercase text-sm">Last Updated</strong>
+              <strong className="block text-gray-400 uppercase text-sm">
+                Last Updated
+              </strong>
               <span className="text-gray-300">{formattedUpdatedAt}</span>
             </p>
+          )}
+
+          {/* Analytics Section */}
+          {loading && (
+            <p className="text-center text-gray-300">Loading analytics...</p>
+          )}
+          {error && <p className="text-center text-red-500">{error}</p>}
+
+          {/* Render appropriate analytics component */}
+          {analytics && user.role === "BUYER" && (
+            <BuyerAnalytics analytics={analytics} />
+          )}
+
+          {analytics && user.role === "SELLER" && (
+            <SellerAnalytics analytics={analytics} />
           )}
         </div>
       </div>
