@@ -36,6 +36,7 @@ const ProductDetails = () => {
     const fetchProductAndReviews = async () => {
       try {
         const productResponse = await axios.get(`${BASE_URL}/products/${id}`);
+        console.log(productResponse);
         setProduct(productResponse.data);
 
         const reviewsResponse = await axios.get(
@@ -116,6 +117,16 @@ const ProductDetails = () => {
     ratingDistribution[review.rating - 1]++;
   });
 
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${BASE_URL}/products/${id}`);
+      alert("Product deleted successfully!");
+      window.location.href = "/products";
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
@@ -186,8 +197,8 @@ const ProductDetails = () => {
           )}
         </div>
 
-        {/* Add a Review */}
-        {user.role === "BUYER" && (
+        {/* Add a Review or Edit Product */}
+        {user.role === "BUYER" ? (
           <div className="mt-8">
             <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
             <form
@@ -239,7 +250,30 @@ const ProductDetails = () => {
               </button>
             </form>
           </div>
-        )}
+        ) : user.role === "SELLER" && product.userId === user.id ? (
+          <div className="mt-8 flex space-x-4">
+            <button
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+              onClick={() => (window.location.href = `/products/edit/${id}`)}
+            >
+              Edit Product
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Are you sure you want to delete this product?"
+                  )
+                ) {
+                  handleDelete();
+                }
+              }}
+            >
+              Delete Product
+            </button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

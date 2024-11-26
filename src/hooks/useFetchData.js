@@ -15,8 +15,9 @@ export const useFetchData = (url) => {
         console.error("Error fetching data:", error);
       }
     };
+
     fetchData();
   }, [url]);
 
-  return [data, setData]; // Return both data and the setData function
+  return [data, setData];
 };

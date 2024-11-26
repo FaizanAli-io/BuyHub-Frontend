@@ -72,6 +72,13 @@ const SellerAnalytics = ({ analytics }) => {
 
   return (
     <>
+      <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+        <div className="grid grid-cols-2 gap-8">
+          <h3 className="text-lg text-gray-300 mb-2">Total Stocked</h3>
+          <p className="text-xl text-white">${analytics.totalInventory}</p>
+        </div>
+      </div>
+
       <div className="my-8 grid grid-cols-2 gap-8">
         <div className="col-span-1">
           <h3 className="text-lg text-gray-300 mb-4">Item Count by Category</h3>

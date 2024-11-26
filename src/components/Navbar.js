@@ -1,16 +1,16 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { FaPowerOff } from "react-icons/fa"; // Importing power icon from react-icons
-import { VscAccount } from "react-icons/vsc"; // Importing profile icon
+import { FaPowerOff } from "react-icons/fa";
+import { VscAccount } from "react-icons/vsc";
 
 function Navbar() {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setUser(null); // Clear user context
-    navigate("/"); // Redirect to home page
+    setUser(null);
+    navigate("/");
   };
 
   return (
@@ -31,6 +31,13 @@ function Navbar() {
               >
                 Products
               </Link>
+              <Link
+                to="/top-products"
+                className="text-gray-300 hover:text-green-400 text-lg font-semibold tracking-wide transition-all duration-300"
+              >
+                Top Products
+              </Link>
+
               {user.role === "BUYER" ? (
                 <>
                   <Link

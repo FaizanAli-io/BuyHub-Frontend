@@ -5,7 +5,7 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:3000";
 
-const ProductCard = ({ product, user }) => {
+const TopProductCard = ({ product, type, user }) => {
   const navigate = useNavigate();
   const [cartItem, setCartItem] = useState(null);
 
@@ -15,6 +15,7 @@ const ProductCard = ({ product, user }) => {
         const response = await axios.get(
           `${BASE_URL}/cartitems/user/${user.id}`
         );
+        console.log(response);
         const item = response.data.find(
           (item) => item.product.id === product.id
         );
@@ -32,7 +33,10 @@ const ProductCard = ({ product, user }) => {
   };
 
   return (
-    <div className="bg-gray-700 rounded-lg shadow-xl p-6 flex flex-col justify-between transition-transform transform hover:scale-105 cursor-pointer hover:shadow-2xl">
+    <div
+      className="bg-gray-700 rounded-lg shadow-xl p-6 flex flex-col justify-between transition-all transform hover:scale-105 cursor-pointer hover:shadow-2xl"
+      onClick={handleNavigateToDetails}
+    >
       <div className="flex flex-col items-center justify-center mb-4">
         <h3 className="text-2xl font-semibold text-white mb-2 hover:text-cyan-400 transition-colors">
           {product.name}
@@ -44,7 +48,16 @@ const ProductCard = ({ product, user }) => {
         <p className="text-gray-200 text-lg font-medium">
           Price: ${product.price.toFixed(2)}
         </p>
-        <p className="text-gray-400">Available: {product.quantity}</p>
+        <p className="text-gray-400">
+          {type === "rating" ? (
+            <>
+              Average Rating: {product.avgRating}{" "}
+              <span className="text-yellow-400">⭐</span>
+            </>
+          ) : (
+            <>Total Purchased: {product.totalPurchased}</>
+          )}
+        </p>
       </div>
 
       {user.role === "BUYER" && (
@@ -60,4 +73,4 @@ const ProductCard = ({ product, user }) => {
   );
 };
 
-export default ProductCard;
+export default TopProductCard;

@@ -2,8 +2,9 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { FaShoppingBag } from "react-icons/fa";
 import { useUser } from "../context/UserContext";
-import BuyerAnalytics from "../components/BuyerAnalytics";
-import SellerAnalytics from "../components/SellerAnalytics";
+import BuyerAnalytics from "../components/analytics/BuyerAnalytics";
+import SellerAnalytics from "../components/analytics/SellerAnalytics";
+import AdminAnalytics from "../components/analytics/AdminAnalytics";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -18,10 +19,17 @@ function Profile() {
       if (!user) return;
 
       try {
+        let response;
         setLoading(true);
-        const response = await axios.get(
-          `${BASE_URL}/analytics/${user.role.toLowerCase()}/${user.id}`
-        );
+
+        if (user.role === "BUYER") {
+          response = await axios.get(`${BASE_URL}/analytics/buyer/${user.id}`);
+        } else if (user.role === "SELLER") {
+          response = await axios.get(`${BASE_URL}/analytics/seller/${user.id}`);
+        } else if (user.role === "ADMIN") {
+          response = await axios.get(`${BASE_URL}/analytics/admin/`);
+        }
+
         setAnalytics(response.data);
       } catch (err) {
         setError("Error fetching analytics data.");
@@ -130,6 +138,11 @@ function Profile() {
 
           {analytics && user.role === "SELLER" && (
             <SellerAnalytics analytics={analytics} />
+          )}
+
+          {/* Render Admin Analytics if the user is an Admin */}
+          {analytics && user.role === "ADMIN" && (
+            <AdminAnalytics analytics={analytics} />
           )}
         </div>
       </div>
