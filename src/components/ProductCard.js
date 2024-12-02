@@ -32,7 +32,10 @@ const ProductCard = ({ product, user }) => {
   };
 
   return (
-    <div className="bg-gray-700 rounded-lg shadow-xl p-6 flex flex-col justify-between transition-transform transform hover:scale-105 cursor-pointer hover:shadow-2xl">
+    <div
+      className="bg-gray-700 rounded-lg shadow-xl p-6 flex flex-col justify-between transition-transform transform hover:scale-105 cursor-pointer hover:shadow-2xl"
+      onClick={handleNavigateToDetails}
+    >
       <div className="flex flex-col items-center justify-center mb-4">
         <h3 className="text-2xl font-semibold text-white mb-2 hover:text-cyan-400 transition-colors">
           {product.name}
