@@ -8,37 +8,59 @@ function Orders() {
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
 
+  const fetchOrdersWithProducts = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/orders/user/${user.id}`);
+      const orders = response.data;
+
+      const ordersWithDetails = await Promise.all(
+        orders.map(async (order) => {
+          const itemsWithDetails = await Promise.all(
+            order.items.map(async (item) => {
+              const productResponse = await axios.get(
+                `${BASE_URL}/products/${item.productId}`
+              );
+              return {
+                ...item,
+                productName: productResponse.data.name,
+                productDescription: productResponse.data.description,
+                productPrice: productResponse.data.price,
+              };
+            })
+          );
+          return { ...order, items: itemsWithDetails };
+        })
+      );
+
+      setOrders(ordersWithDetails);
+    } catch (error) {
+      console.error("Error fetching orders or product details:", error);
+    }
+  };
+
+  const handleMakePayment = async (orderId) => {
+    try {
+      await axios.get(`${BASE_URL}/orders/${orderId}/payOrder`);
+      alert("Payment successful!");
+      fetchOrdersWithProducts();
+    } catch (error) {
+      console.error("Error making payment:", error);
+      alert("Failed to make payment.");
+    }
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await axios.get(`${BASE_URL}/orders/${orderId}/cancelOrder`);
+      alert("Order cancelled successfully.");
+      fetchOrdersWithProducts();
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      alert("Failed to cancel order.");
+    }
+  };
+
   useEffect(() => {
-    const fetchOrdersWithProducts = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/orders/user/${user.id}`);
-        const orders = response.data;
-
-        const ordersWithDetails = await Promise.all(
-          orders.map(async (order) => {
-            const itemsWithDetails = await Promise.all(
-              order.items.map(async (item) => {
-                const productResponse = await axios.get(
-                  `${BASE_URL}/products/${item.productId}`
-                );
-                return {
-                  ...item,
-                  productName: productResponse.data.name,
-                  productDescription: productResponse.data.description,
-                  productPrice: productResponse.data.price,
-                };
-              })
-            );
-            return { ...order, items: itemsWithDetails };
-          })
-        );
-
-        setOrders(ordersWithDetails);
-      } catch (error) {
-        console.error("Error fetching orders or product details:", error);
-      }
-    };
-
     fetchOrdersWithProducts();
   }, [user.id]);
 
@@ -96,6 +118,26 @@ function Orders() {
                     )
                     .toFixed(2)}
                 </div>
+              </div>
+
+              {/* Add Make Payment and Cancel Order Buttons */}
+              <div className="mt-4 flex justify-between">
+                {order.status === "SHIPPING" && (
+                  <>
+                    <button
+                      className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                      onClick={() => handleMakePayment(order.id)}
+                    >
+                      Make Payment
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                      onClick={() => handleCancelOrder(order.id)}
+                    >
+                      Cancel Order
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}

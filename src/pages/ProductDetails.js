@@ -16,11 +16,13 @@ const formatDate = (dateString) => {
 const BASE_URL = "http://localhost:3000";
 
 const ProductDetails = () => {
+  let { id } = useParams();
   const { user } = useUser();
-  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 0, content: "" });
+
+  id = Number(id);
 
   const fetchUser = async (userId) => {
     try {
@@ -44,9 +46,11 @@ const ProductDetails = () => {
         );
         const reviewsWithDetails = await Promise.all(
           reviewsResponse.data.map(async (review) => {
-            const username = await fetchUser(review.userId);
-            const formattedDate = formatDate(review.createdAt);
-            return { ...review, username, formattedDate };
+            return {
+              ...review,
+              username: review.userName,
+              formattedDate: formatDate(review.createdAt),
+            };
           })
         );
         setReviews(reviewsWithDetails);
@@ -71,8 +75,8 @@ const ProductDetails = () => {
 
     try {
       const response = await axios.post(`${BASE_URL}/reviews`, {
-        userId: user.id,
         productId: id,
+        userId: user.id,
         rating: newReview.rating,
         content: newReview.content,
       });

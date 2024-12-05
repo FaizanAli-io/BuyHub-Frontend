@@ -36,10 +36,10 @@ function AddProduct() {
     e.preventDefault();
     const productData = {
       userId: user.id, // Assuming user has an id property
-      categoryId: formData.categoryId,
+      categoryId: Number(formData.categoryId),
       name: formData.name,
       description: formData.description,
-      quantity: formData.quantity,
+      quantity: Number(formData.quantity),
       price: parseFloat(formData.price),
     };
 

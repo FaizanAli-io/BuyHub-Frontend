@@ -5,7 +5,7 @@ import axios from "axios";
 const BASE_URL = "http://localhost:3000";
 
 const EditProduct = () => {
-  const { id } = useParams();
+  let { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState({
     name: "",
@@ -14,6 +14,8 @@ const EditProduct = () => {
     quantity: "",
   });
   const [loading, setLoading] = useState(true);
+
+  id = Number(id);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -35,6 +37,7 @@ const EditProduct = () => {
   };
 
   const handleSubmit = async (e) => {
+    console.log(product);
     e.preventDefault();
     try {
       await axios.patch(`${BASE_URL}/products/${id}`, product);

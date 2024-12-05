@@ -11,7 +11,9 @@ function Signup() {
     email: "",
     password: "",
     role: "BUYER",
+    address: "",
   });
+
   const navigate = useNavigate();
   const { setUser } = useUser();
 
@@ -22,6 +24,7 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     try {
       const response = await axios.post(
         "http://localhost:3000/users",
@@ -64,6 +67,14 @@ function Signup() {
           name="password"
           placeholder="Password"
           value={formData.password}
+          onChange={handleChange}
+          className="w-full px-4 py-2 bg-gray-700 text-gray-300 border-none rounded outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        <FormInput
+          type="text"
+          name="address"
+          placeholder="Address"
+          value={formData.address || ""}
           onChange={handleChange}
           className="w-full px-4 py-2 bg-gray-700 text-gray-300 border-none rounded outline-none focus:ring-2 focus:ring-cyan-500"
         />
