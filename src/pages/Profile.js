@@ -2,9 +2,9 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 
 import { useUser } from "../context/UserContext";
-import UserProfile from "../components/UserProfile";
-import BuyerReviews from "../components/BuyerReviews";
-import ProfileHeader from "../components/ProfileHeader";
+import UserProfile from "../components/profile/UserProfile";
+import BuyerReviews from "../components/profile/BuyerReviews";
+import ProfileHeader from "../components/profile/ProfileHeader";
 import AdminAnalytics from "../components/analytics/AdminAnalytics";
 import BuyerAnalytics from "../components/analytics/BuyerAnalytics";
 import SellerAnalytics from "../components/analytics/SellerAnalytics";
@@ -54,16 +54,12 @@ function Profile() {
     );
   }
 
-  const roleColors = {
-    ADMIN: "green",
-    SELLER: "orange",
-    BUYER: "blue",
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <ProfileHeader role={user.role} color={roleColors[user.role]} />
+      <ProfileHeader role={user.role} />
+
       <UserProfile user={user} />
+
       <div className="max-w-4xl mx-auto bg-gray-800 shadow-lg rounded-lg p-8 mt-8">
         {loading && (
           <p className="text-center text-gray-300">Loading analytics...</p>

@@ -1,5 +1,3 @@
-import React from "react";
-
 function FormInput({ type, name, placeholder, value, onChange, className }) {
   return (
     <input

@@ -22,7 +22,7 @@ function BuyerReviews({ userId }) {
       try {
         setLoading(true);
         const response = await axios.get(`${BASE_URL}/reviews/user/${userId}`);
-        setReviews(response.data.slice(-10)); // Get last 10 reviews
+        setReviews(response.data.reverse().slice(0, 10));
       } catch (err) {
         setError("Error fetching reviews.");
       } finally {

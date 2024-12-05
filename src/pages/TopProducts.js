@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import TopProductCard from "../components/TopProductCard";
-import { useUser } from "../context/UserContext"; // Importing the user context
+import React, { useState, useEffect } from "react";
+
+import { useUser } from "../context/UserContext";
+import ProductCard from "../components/product/ProductCard";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -9,7 +10,7 @@ function TopProducts() {
   const [topRatedProducts, setTopRatedProducts] = useState([]);
   const [topPurchasedProducts, setTopPurchasedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useUser(); // Accessing the user from context
+  const { user } = useUser();
 
   useEffect(() => {
     const fetchTopProducts = async () => {
@@ -50,11 +51,11 @@ function TopProducts() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {topRatedProducts.map((product) => (
-              <TopProductCard
+              <ProductCard
                 key={product.id}
                 product={product}
                 type="rating"
-                user={user} // Passing the user as a prop
+                user={user}
               />
             ))}
           </div>
@@ -66,7 +67,7 @@ function TopProducts() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {topPurchasedProducts.map((product) => (
-              <TopProductCard
+              <ProductCard
                 key={product.id}
                 product={product}
                 type="purchases"

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 const BASE_URL = "http://localhost:3000";
 
 function Orders() {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [orders, setOrders] = useState([]);
 
   const fetchOrdersWithProducts = async () => {
@@ -40,8 +40,15 @@ function Orders() {
 
   const handleMakePayment = async (orderId) => {
     try {
-      await axios.get(`${BASE_URL}/orders/${orderId}/payOrder`);
-      alert("Payment successful!");
+      const response = await axios.get(
+        `${BASE_URL}/orders/${orderId}/payOrder`
+      );
+      const total = response.data.total;
+      alert(`Payment of $${total} received!`);
+
+      const updatedUser = { ...user, balance: user.balance - total };
+      setUser(updatedUser);
+
       fetchOrdersWithProducts();
     } catch (error) {
       console.error("Error making payment:", error);

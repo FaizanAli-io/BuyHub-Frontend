@@ -1,7 +1,13 @@
 import React from "react";
 import { FaShoppingCart, FaStore, FaUserShield } from "react-icons/fa";
 
-function ProfileHeader({ role, color }) {
+function ProfileHeader({ role }) {
+  const color = {
+    ADMIN: "green",
+    SELLER: "orange",
+    BUYER: "blue",
+  }[role];
+
   const colorClasses = {
     blue: {
       primary: "#1e3a8a",

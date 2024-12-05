@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { useFetchData } from "../hooks/useFetchData";
-import ProductCard from "../components/ProductCard";
-import SearchBar from "../components/SearchBar";
-import ProductSorter from "../components/ProductSorter";
+import ProductCard from "../components/product/ProductCard";
+import SearchBar from "../components/product/SearchBar";
+import ProductSorter from "../components/product/ProductSorter";
 import { IoArrowBackCircle } from "react-icons/io5";
 import {
   FaEye,

@@ -52,8 +52,9 @@ const CartOptions = ({
   };
 
   return (
-    <div className="flex flex-col justify-between mt-4 border-t border-gray-600 pt-4 h-full">
-      <div className="flex items-center justify-start space-x-4 mb-4">
+    <div>
+      <div className="border-t border-gray-500 w-full mb-4"></div>
+      <div className="flex items-end justify-start space-x-4 mb-4">
         <input
           type="number"
           min="0"
@@ -65,28 +66,26 @@ const CartOptions = ({
               Math.max(0, Math.min(product.quantity, Number(e.target.value)))
             )
           }
-          className="w-20 p-2 border-2 border-gray-500 rounded-lg text-center bg-gray-800 text-white transition duration-200 focus:ring-2 focus:ring-cyan-500"
+          className="h-10 w-20 p-2 border-2 border-gray-500 rounded-lg text-center bg-gray-800 text-white transition duration-200 focus:ring-2 focus:ring-cyan-500"
         />
 
         {cartItem ? (
-          // Display Update Cart button if the product is already in the cart
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleUpdateCart();
             }}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+            className="h-10 px-6 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition duration-200"
           >
             Update Cart
           </button>
         ) : (
-          // Display Add to Cart button if the product is not in the cart
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleAddToCart();
             }}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200"
+            className="h-10 px-6 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition duration-200"
           >
             Add to Cart
           </button>

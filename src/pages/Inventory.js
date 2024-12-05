@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { useFetchData } from "../hooks/useFetchData";
-import ProductCard from "../components/ProductCard";
-import CategoryFilter from "../components/CategoryFilter";
-import ProductSorter from "../components/ProductSorter";
-import SearchBar from "../components/SearchBar";
+import ProductCard from "../components/product/ProductCard";
+import CategoryFilter from "../components/product/CategoryFilter";
+import ProductSorter from "../components/product/ProductSorter";
+import SearchBar from "../components/product/SearchBar";
 
 const Inventory = () => {
   const { user } = useUser();
